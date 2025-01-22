@@ -1,0 +1,26 @@
+To enhance ASR performance in noisy environments, data augmentation techniques can be applied to generate synthetic noisy speech data.
+import numpy as np
+import librosa
+import matplotlib.pyplot as plt
+
+# Load the clean audio file
+audio_file = '/content/sample_data/audio.wav'
+y, sr = librosa.load(audio_file)
+
+# Add noise to the audio signal (e.g., Gaussian noise)
+noise_factor = 0.02
+noise = np.random.randn(len(y))
+noisy_audio = y + noise_factor * noise
+
+# Display the waveform of noisy audio
+plt.figure(figsize=(10, 4))
+plt.subplot(1, 2, 1)
+plt.title('Clean Audio')
+plt.plot(y)
+plt.subplot(1, 2, 2)
+plt.title('Noisy Audio')
+plt.plot(noisy_audio)
+plt.tight_layout()
+plt.show()
+
+# You can now use this noisy audio for training your ASR models.
