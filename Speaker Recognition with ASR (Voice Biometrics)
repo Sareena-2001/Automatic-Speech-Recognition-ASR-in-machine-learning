@@ -1,0 +1,37 @@
+Speaker recognition systems can be used in conjunction with ASR to not only recognize speech but also identify the speaker. This can be useful in personalized voice assistants or secure environments.
+
+Code Example: Speaker Recognition with MFCC Features and SVM Classifier
+import librosa
+from sklearn.svm import SVC
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+
+# Load a sample audio file for speaker recognition
+audio_file = '/content/sample_data/audio.wav'
+audio_input, sr = librosa.load(audio_file, sr=16000)
+
+# Extract Mel-frequency cepstral coefficients (MFCC) from the audio
+mfccs = librosa.feature.mfcc(y=audio_input, sr=sr, n_mfcc=13)
+mfccs = np.mean(mfccs.T, axis=0)  # Mean across time
+
+# Example: Labels for different speakers (e.g., 'Speaker1', 'Speaker2')
+speakers = ['Speaker1', 'Speaker2']
+X_train = [mfccs]  # List of MFCCs for training
+y_train = [0]  # Corresponding labels (0 for 'Speaker1')
+
+# Encode speaker labels
+label_encoder = LabelEncoder()
+y_train_encoded = label_encoder.fit_transform(y_train)
+
+# Train an SVM classifier for speaker recognition
+svm_classifier = SVC(kernel='linear')
+svm_classifier.fit(X_train, y_train_encoded)
+
+# Predict the speaker for a new input
+new_audio_input, _ = librosa.load('/content/sample_data/new_audio.wav', sr=16000)
+new_mfccs = librosa.feature.mfcc(y=new_audio_input, sr=sr, n_mfcc=13)
+new_mfccs = np.mean(new_mfccs.T, axis=0)
+
+# Predict speaker identity
+predicted_speaker = label_encoder.inverse_transform(svm_classifier.predict([new_mfccs]))
+print(f"Predicted speaker: {predicted_speaker[0]}")
