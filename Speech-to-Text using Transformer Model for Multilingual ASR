@@ -1,0 +1,24 @@
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+import torch
+import librosa
+
+# Load a multilingual pre-trained Wav2Vec 2.0 model
+model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-xlsr-53")
+processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
+
+# Load an audio file (16kHz is required)
+audio_file = '/content/sample_data/audio.wav'
+audio_input, _ = librosa.load(audio_file, sr=16000)
+
+# Prepare input for the model
+input_values = processor(audio_input, return_tensors="pt").input_values
+
+# Transcribe the speech
+with torch.no_grad():
+    logits = model(input_values).logits
+
+# Decode the predicted IDs to get the transcription
+predicted_ids = torch.argmax(logits, dim=-1)
+transcription = processor.batch_decode(predicted_ids)
+
+print("Transcription: ", transcription[0])
