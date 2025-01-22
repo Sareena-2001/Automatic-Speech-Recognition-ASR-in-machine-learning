@@ -1,0 +1,25 @@
+import speech_recognition as sr
+
+# Initialize recognizer
+recognizer = sr.Recognizer()
+
+# Use a sample .wav file available in your environment
+audio_file = "/content/sample_data/Mozart_from_Piano_Sonata_K310_first_movement.wav"
+
+# Try to recognize speech from the audio file
+try:
+    with sr.AudioFile(audio_file) as source:
+        # Adjust for ambient noise and record audio
+        recognizer.adjust_for_ambient_noise(source)
+        audio_data = recognizer.record(source)
+        
+        # Recognize speech using Google's API
+        text = recognizer.recognize_google(audio_data)
+        print("Transcription: ", text)
+
+except sr.UnknownValueError:
+    print("Google Speech Recognition could not understand the audio.")
+except sr.RequestError as e:
+    print(f"Could not request results from Google Speech Recognition service; {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
