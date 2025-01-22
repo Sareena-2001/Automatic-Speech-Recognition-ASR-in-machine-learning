@@ -1,0 +1,26 @@
+Using pre-trained models for ASR tasks significantly reduces training time and improves model accuracy. Wav2Vec 2.0 can be fine-tuned for specific ASR tasks.
+
+Code Example: Fine-tuning Pre-trained Wav2Vec 2.0
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+import torch
+import librosa
+
+# Load the pre-trained Wav2Vec 2.0 model and processor
+model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
+processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
+
+# Load and preprocess an audio file
+audio_input, sr = librosa.load("/content/sample_data/audio.wav", sr=16000)
+
+# Use the processor to extract features
+input_values = processor(audio_input, return_tensors="pt").input_values
+
+# Predict using the pre-trained model
+with torch.no_grad():
+    logits = model(input_values).logits
+
+# Get predicted transcription (greedy decoding)
+predicted_ids = torch.argmax(logits, dim=-1)
+transcription = processor.decode(predicted_ids[0])
+
+print("Transcription:", transcription)
