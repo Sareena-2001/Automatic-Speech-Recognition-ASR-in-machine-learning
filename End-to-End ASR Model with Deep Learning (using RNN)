@@ -1,0 +1,44 @@
+An end-to-end Recurrent Neural Network (RNN) model for ASR is an approach where the entire ASR system is trained in one step. It takes raw speech input and outputs the corresponding transcription.
+
+Code Example: RNN-Based End-to-End ASR
+
+import tensorflow as tf
+from tensorflow.keras import layers, models
+import librosa
+import numpy as np
+
+# Load and preprocess an audio file
+audio_file = '/content/sample_data/audio.wav'
+audio_input, _ = librosa.load(audio_file, sr=16000)
+
+# Feature extraction: Convert audio to Mel spectrograms
+mel_spectrogram = librosa.feature.melspectrogram(audio_input, sr=16000, n_mels=128)
+mel_spectrogram = np.log(mel_spectrogram + 1e-6)
+
+# Reshape for model input
+mel_spectrogram = mel_spectrogram.T  # Shape: (time_steps, n_mels)
+
+# Build a simple RNN-based model
+model = models.Sequential([
+    layers.InputLayer(input_shape=(mel_spectrogram.shape[0], mel_spectrogram.shape[1])),
+    layers.LSTM(128, return_sequences=True),
+    layers.LSTM(128),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(40, activation='softmax')  # 40 classes for phonemes or words
+])
+
+# Compile the model
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Example: Mock training (replace with real labeled data)
+X_train = np.random.rand(100, mel_spectrogram.shape[0], mel_spectrogram.shape[1])  # Example feature data
+y_train = np.random.randint(0, 40, size=(100,))  # Example labels
+
+# Train the model
+model.fit(X_train, y_train, epochs=10)
+
+# Prediction on new audio
+predicted_output = model.predict(mel_spectrogram[np.newaxis, ...])  # Add batch dimension
+print(predicted_output)
+
+
