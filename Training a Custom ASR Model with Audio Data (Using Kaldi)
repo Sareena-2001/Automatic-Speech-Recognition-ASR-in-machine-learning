@@ -1,0 +1,22 @@
+Kaldi is a powerful toolkit for building ASR systems. Here's an example of using Kaldi to train a custom acoustic model.
+
+Code Example: Kaldi-based ASR Training Pipeline
+# Step 1: Download the Kaldi toolkit and setup environment
+git clone https://github.com/kaldi-asr/kaldi.git
+cd kaldi/tools
+make
+cd ../src
+./configure
+make
+
+# Step 2: Preprocess audio data (converting WAV to features)
+# Assuming the audio file is available in /data/audio
+steps/make_mfcc.sh --nj 4 --cmd "run.pl" /data/audio exp/mfcc
+
+# Step 3: Train the acoustic model
+# Define the training data directory and start training
+steps/train_mono.sh --nj 4 --cmd "run.pl" /data/audio data/lang exp/mono
+
+# Step 4: Recognize speech
+# Use the trained model to recognize speech from test data
+steps/decode.sh --nj 4 --cmd "run.pl" exp/mono/graph data/test exp/mono/decode
