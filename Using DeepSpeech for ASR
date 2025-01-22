@@ -1,0 +1,16 @@
+import deepspeech
+import wave
+import numpy as np
+
+# Load pre-trained DeepSpeech model
+model = deepspeech.Model('deepspeech-0.9.3-models.pbmm')
+
+# Open audio file
+audio_file = '/content/sample_data/audio.wav'
+with wave.open(audio_file, 'r') as audio:
+    frames = audio.readframes(audio.getnframes())
+    audio_data = np.frombuffer(frames, dtype=np.int16)
+
+# Transcribe audio using DeepSpeech model
+text = model.stt(audio_data)
+print("Transcription: ", text)
