@@ -1,0 +1,31 @@
+This example assumes that you are combining a Deep Neural Network (DNN) with a Hidden Markov Model (HMM) for a hybrid ASR system.
+
+import numpy as np
+from sklearn.neural_network import MLPClassifier
+from hmmlearn import hmm
+
+# Example feature vectors extracted from an audio file
+# These would normally come from a feature extraction process like MFCC
+features = np.array([[0.1, 0.5, 0.3], [0.4, 0.7, 0.6], [0.3, 0.4, 0.2], [0.7, 0.6, 0.8]])
+
+# Example labels (corresponding phonemes or words)
+labels = np.array([1, 2, 1, 3])
+
+# Train a neural network to classify speech features
+dnn = MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000)
+dnn.fit(features, labels)
+
+# Predict the class labels for a new input feature set
+new_features = np.array([[0.5, 0.6, 0.7]])
+predicted_labels = dnn.predict(new_features)
+
+# Now use HMM for sequential modeling (speech decoding)
+model = hmm.MultinomialHMM(n_components=3)  # Assume 3 possible states for HMM
+model.fit(features)  # Train HMM on features
+
+# Use the trained model for decoding
+hmm_predictions = model.predict(new_features)
+
+print("DNN Prediction: ", predicted_labels)
+print("HMM Prediction: ", hmm_predictions)
+
