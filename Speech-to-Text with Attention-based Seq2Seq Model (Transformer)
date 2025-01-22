@@ -1,0 +1,30 @@
+Using a Seq2Seq model with attention mechanism can significantly improve performance in ASR tasks, especially for long sequences of speech data. This approach is widely used in speech recognition.
+
+Code Example: Attention-based Seq2Seq Model
+import tensorflow as tf
+from tensorflow.keras import layers
+
+# Example: Build a simple transformer-based model for ASR
+input_audio = layers.Input(shape=(None, 128))  # Audio feature sequence (e.g., Mel-spectrogram)
+encoder = layers.LSTM(256, return_state=True)
+encoder_outputs, state_h, state_c = encoder(input_audio)
+
+# Decoder (with attention mechanism)
+decoder_input = layers.Input(shape=(None, 128))  # Decoder input sequence (e.g., transcription)
+attention = layers.AdditiveAttention()([decoder_input, encoder_outputs])
+decoder_lstm = layers.LSTM(256, return_sequences=True)
+decoder_outputs = decoder_lstm(attention)
+
+# Output layer (Softmax over vocabulary)
+output = layers.Dense(40, activation='softmax')(decoder_outputs)  # 40 classes for phonemes
+
+# Build the model
+model = tf.keras.Model(inputs=[input_audio, decoder_input], outputs=output)
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Training the model (mock example with random data)
+X_train_audio = np.random.rand(100, 200, 128)  # 100 samples, 200 time steps, 128 features
+X_train_text = np.random.rand(100, 100, 128)   # 100 samples, 100 time steps, 128 features
+y_train = np.random.randint(0, 40, size=(100, 100, 40))  # Example transcription labels
+
+model.fit([X_train_audio, X_train_text], y_train, epochs=10)
